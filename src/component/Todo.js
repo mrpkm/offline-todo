@@ -5,48 +5,44 @@ import { MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import { MdDelete } from 'react-icons/md';
 
 function Todo() {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState(() => {
+        const savedData = localStorage.getItem('todoList');
+        return savedData ? JSON.parse(savedData) : [];
+    });
     const [todo, settodo] = useState('');
 
-  // this is the use jsonplaceholder api 
     useEffect(() => {
-        fetch('https://jsonplaceholder.typicode.com/todos?_limit=10') // Fetch only 10 todos
-            .then((response) => response.json())
-            .then((todos) => {
-                // set here to data
-                setData(todos);
-            });
-    }, []);
+        localStorage.setItem('todoList', JSON.stringify(data));
+    }, [data]);
 
-    // this is for add the todo list
+    // Function to add a new todo item
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!todo) {
             alert('Please fill the task...');
             return;
         }
-        const newItem = { title: todo, checked: false }; 
+        const newItem = { title: todo, checked: false };
         const newData = [newItem, ...data];
         setData(newData);
         settodo('');
     };
-// this is a delete function
+
+    // Function to delete a todo item
     const handleDelete = (index) => {
         const newData = [...data];
         newData.splice(index, 1);
         setData(newData);
     };
- // this is a toggle function 
+
+    // Function to toggle the completion of a todo item
     const handleToggle = (index) => {
         const newData = [...data];
         newData[index].checked = !newData[index].checked;
         setData(newData);
     };
 
-    
-
     return (
-        // input box and add button
         <div className="todoPage">
             <form className="form" onSubmit={handleSubmit}>
                 <input
@@ -56,10 +52,9 @@ function Todo() {
                     placeholder="Write Your Task..."
                     onChange={(e) => settodo(e.target.value)}
                 />
-                <button type="submit">Send</button>
+                <button type="submit">Add</button>
             </form>
 
-            {/* here is list of todo with map function and toggle and delete button */}
             <div className="todoList">
                 <ul>
                     {data.map((item, index) => (
